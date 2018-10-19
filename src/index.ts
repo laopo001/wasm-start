@@ -5,7 +5,7 @@
  * @author: liaodh
  * @summary: short description for the file
  * -----
- * Last Modified: Friday, October 19th 2018, 3:45:10 pm
+ * Last Modified: Friday, October 19th 2018, 9:00:16 am
  * Modified By: liaodh
  * -----
  * Copyright (c) 2018 jiguang
@@ -14,3 +14,5 @@
 import * as wasm from 'wasm';
 
 console.log(wasm.run())
+
+console.log(wasm.collect_numbers([1,2]))

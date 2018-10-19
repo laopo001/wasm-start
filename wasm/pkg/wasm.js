@@ -1,6 +1,62 @@
 /* tslint:disable */
 import * as wasm from './wasm_bg';
 
+const stack = [];
+
+function addBorrowedObject(obj) {
+    stack.push(obj);
+    return ((stack.length - 1) << 1) | 1;
+}
+
+const slab = [{ obj: undefined }, { obj: null }, { obj: true }, { obj: false }];
+
+function getObject(idx) {
+    if ((idx & 1) === 1) {
+        return stack[idx >> 1];
+    } else {
+        const val = slab[idx >> 1];
+
+        return val.obj;
+
+    }
+}
+
+let slab_next = slab.length;
+
+function dropRef(idx) {
+
+    idx = idx >> 1;
+    if (idx < 4) return;
+    let obj = slab[idx];
+
+    obj.cnt -= 1;
+    if (obj.cnt > 0) return;
+
+    // If we hit 0 then free up our space in the slab
+    slab[idx] = slab_next;
+    slab_next = idx;
+}
+
+function takeObject(idx) {
+    const ret = getObject(idx);
+    dropRef(idx);
+    return ret;
+}
+/**
+* @param {any} arg0
+* @returns {any}
+*/
+export function collect_numbers(arg0) {
+    try {
+        return takeObject(wasm.collect_numbers(addBorrowedObject(arg0)));
+
+    } finally {
+        stack.pop();
+
+    }
+
+}
+
 let cachedTextDecoder = new TextDecoder('utf-8');
 
 let cachegetUint8Memory = null;
@@ -46,13 +102,15 @@ export function run() {
 
 }
 
-const __widl_f_create_element_Document_target = Document.prototype.createElement || function() {
-    throw new Error(`wasm-bindgen: Document.prototype.createElement does not exist`);
-};
+let cachedTextEncoder = new TextEncoder('utf-8');
 
-const slab = [{ obj: undefined }, { obj: null }, { obj: true }, { obj: false }];
+function passStringToWasm(arg) {
 
-let slab_next = slab.length;
+    const buf = cachedTextEncoder.encode(arg);
+    const ptr = wasm.__wbindgen_malloc(buf.length);
+    getUint8Memory().set(buf, ptr);
+    return [ptr, buf.length];
+}
 
 function addHeapObject(obj) {
     if (slab_next === slab.length) slab.push(slab.length + 1);
@@ -64,19 +122,36 @@ function addHeapObject(obj) {
     slab[idx] = { obj, cnt: 1 };
     return idx << 1;
 }
+/**
+* @param {string} arg0
+* @param {any} arg1
+* @param {any} arg2
+* @returns {string}
+*/
+export function createElement(arg0, arg1, arg2) {
+    const [ptr0, len0] = passStringToWasm(arg0);
+    const retptr = globalArgumentPtr();
+    try {
+        wasm.createElement(retptr, ptr0, len0, addBorrowedObject(arg1), addHeapObject(arg2));
+        const mem = getUint32Memory();
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
 
-const stack = [];
+        const realRet = getStringFromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 1);
+        return realRet;
 
-function getObject(idx) {
-    if ((idx & 1) === 1) {
-        return stack[idx >> 1];
-    } else {
-        const val = slab[idx >> 1];
 
-        return val.obj;
+    } finally {
+        stack.pop();
 
     }
+
 }
+
+const __widl_f_create_element_Document_target = Document.prototype.createElement || function() {
+    throw new Error(`wasm-bindgen: Document.prototype.createElement does not exist`);
+};
 
 export function __widl_f_create_element_Document(arg0, arg1, arg2, exnptr) {
     let varg1 = getStringFromWasm(arg1, arg2);
@@ -153,6 +228,18 @@ export function __widl_f_document_Window(arg0) {
 
 }
 
+export function __wbg_new_7a259c7860f1b5c4() {
+    return addHeapObject(new Array());
+}
+
+const __wbg_push_236df23a2ba3782d_target = Array.prototype.push || function() {
+    throw new Error(`wasm-bindgen: Array.prototype.push does not exist`);
+};
+
+export function __wbg_push_236df23a2ba3782d(arg0, arg1) {
+    return __wbg_push_236df23a2ba3782d_target.call(getObject(arg0), getObject(arg1));
+}
+
 export function __wbg_newnoargs_f3005d02efe69623(arg0, arg1) {
     let varg0 = getStringFromWasm(arg0, arg1);
     return addHeapObject(new Function(varg0));
@@ -173,6 +260,60 @@ export function __wbg_call_10738551fb4d99e4(arg0, arg1, exnptr) {
     }
 }
 
+const __wbg_next_da9f5778cde00c4e_target = function() {
+    return this.next();
+};
+
+export function __wbg_next_da9f5778cde00c4e(arg0, exnptr) {
+    try {
+        return addHeapObject(__wbg_next_da9f5778cde00c4e_target.call(getObject(arg0)));
+    } catch (e) {
+        const view = getUint32Memory();
+        view[exnptr / 4] = 1;
+        view[exnptr / 4 + 1] = addHeapObject(e);
+
+    }
+}
+
+const __wbg_done_da646dabefc0c0ce_target = function() {
+    return this.done;
+};
+
+export function __wbg_done_da646dabefc0c0ce(arg0) {
+    return __wbg_done_da646dabefc0c0ce_target.call(getObject(arg0)) ? 1 : 0;
+}
+
+const __wbg_value_0d5b146abcfc1b1e_target = function() {
+    return this.value;
+};
+
+export function __wbg_value_0d5b146abcfc1b1e(arg0) {
+    return addHeapObject(__wbg_value_0d5b146abcfc1b1e_target.call(getObject(arg0)));
+}
+
+const __wbg_get_b5fa2669cbf91d6f_target = Reflect.get.bind(Reflect) || function() {
+    throw new Error(`wasm-bindgen: Reflect.get.bind(Reflect) does not exist`);
+};
+
+export function __wbg_get_b5fa2669cbf91d6f(arg0, arg1, exnptr) {
+    try {
+        return addHeapObject(__wbg_get_b5fa2669cbf91d6f_target(getObject(arg0), getObject(arg1)));
+    } catch (e) {
+        const view = getUint32Memory();
+        view[exnptr / 4] = 1;
+        view[exnptr / 4 + 1] = addHeapObject(e);
+
+    }
+}
+
+const __wbg_iterator_abc35ff100957036_target = function() {
+    return Symbol.iterator;
+};
+
+export function __wbg_iterator_abc35ff100957036() {
+    return addHeapObject(__wbg_iterator_abc35ff100957036_target());
+}
+
 export function __wbindgen_object_clone_ref(idx) {
     // If this object is on the stack promote it to the heap.
     if ((idx & 1) === 1) return addHeapObject(getObject(idx));
@@ -184,29 +325,26 @@ export function __wbindgen_object_clone_ref(idx) {
     return idx;
 }
 
-function dropRef(idx) {
-
-    idx = idx >> 1;
-    if (idx < 4) return;
-    let obj = slab[idx];
-
-    obj.cnt -= 1;
-    if (obj.cnt > 0) return;
-
-    // If we hit 0 then free up our space in the slab
-    slab[idx] = slab_next;
-    slab_next = idx;
-}
-
 export function __wbindgen_object_drop_ref(i) {
     dropRef(i);
 }
 
-function takeObject(idx) {
-    const ret = getObject(idx);
-    dropRef(idx);
-    return ret;
+export function __wbindgen_string_new(p, l) {
+    return addHeapObject(getStringFromWasm(p, l));
+}
+
+export function __wbindgen_is_object(i) {
+    const val = getObject(i);
+    return typeof(val) === 'object' && val !== null ? 1 : 0;
+}
+
+export function __wbindgen_is_function(i) {
+    return typeof(getObject(i)) === 'function' ? 1 : 0;
 }
 
 export function __wbindgen_rethrow(idx) { throw takeObject(idx); }
+
+export function __wbindgen_throw(ptr, len) {
+    throw new Error(getStringFromWasm(ptr, len));
+}
 

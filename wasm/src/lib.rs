@@ -18,17 +18,16 @@ cfg_if! {
 }
 
 #[wasm_bindgen]
-extern "C" {
-    fn alert(s: &str);
+extern {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
 }
 
 #[wasm_bindgen]
 pub fn collect_numbers(some_iterable: &JsValue) -> Result<js_sys::Array, JsValue> {
     let nums = js_sys::Array::new();
 
-    let iterator = match js_sys::try_iter(some_iterable)?.ok_or_else(|| {
-        "need to pass iterable JS values!".into()
-    })?;
+    let iterator = js_sys::try_iter(some_iterable)?.ok_or("need to pass iterable JS values!")?;
 
     for x in iterator {
         // If the iterator's `next` method throws an error, propagate it
@@ -36,9 +35,9 @@ pub fn collect_numbers(some_iterable: &JsValue) -> Result<js_sys::Array, JsValue
         let x = x?;
 
         // If `x` is a number, add it to our array of numbers!
-        if x.is_f64() {
+        // if x.is_f64() {
             nums.push(&x);
-        }
+        // }
     }
 
     Ok(nums)
@@ -61,5 +60,10 @@ pub fn run() -> Result<String, JsValue> {
     // `append_child` method.
     std::convert::AsRef::<web_sys::Node>::as_ref(&body).append_child(val.as_ref())?;
 
+    Ok("123".to_string())
+}
+
+#[wasm_bindgen]
+pub fn createElement(nodeName: String, props: &JsValue, children : js_sys::Array) -> Result<String, JsValue> {
     Ok("123".to_string())
 }
