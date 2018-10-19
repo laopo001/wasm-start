@@ -575,3 +575,7 @@ error: Could not compile `wasm`.
 
 To learn more, run the command again with --verbose.
 
+Oct 19 07:47:54.687 ERRO Compiling your crate to WebAssembly
+Oct 19 07:48:42.144 ERRO Compiling your crate to WebAssembly
+Oct 19 07:48:54.982 ERRO Compiling your crate to WebAssembly
+Oct 19 07:49:11.131 ERRO Compiling your crate to WebAssembly

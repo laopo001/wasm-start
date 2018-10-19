@@ -15,17 +15,6 @@ function getStringFromWasm(ptr, len) {
     return cachedTextDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
 }
 
-export function __wbg_alert_e63a4c41bbd7a3e9(arg0, arg1) {
-    let varg0 = getStringFromWasm(arg0, arg1);
-    alert(varg0);
-}
-/**
-* @returns {void}
-*/
-export function greet() {
-    return wasm.greet();
-}
-
 let cachedGlobalArgumentPtr = null;
 function globalArgumentPtr() {
     if (cachedGlobalArgumentPtr === null) {

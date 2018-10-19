@@ -1,12 +1,11 @@
 extern crate cfg_if;
+extern crate js_sys;
 extern crate wasm_bindgen;
 extern crate web_sys;
-extern crate js_sys;
 mod utils;
 
 use cfg_if::cfg_if;
 use wasm_bindgen::prelude::*;
-
 
 cfg_if! {
     // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -19,13 +18,30 @@ cfg_if! {
 }
 
 #[wasm_bindgen]
-extern {
+extern "C" {
     fn alert(s: &str);
 }
 
 #[wasm_bindgen]
-pub fn greet() {
-    alert("Hello, wasm!");
+pub fn collect_numbers(some_iterable: &JsValue) -> Result<js_sys::Array, JsValue> {
+    let nums = js_sys::Array::new();
+
+    let iterator = match js_sys::try_iter(some_iterable)?.ok_or_else(|| {
+        "need to pass iterable JS values!".into()
+    })?;
+
+    for x in iterator {
+        // If the iterator's `next` method throws an error, propagate it
+        // up to the caller.
+        let x = x?;
+
+        // If `x` is a number, add it to our array of numbers!
+        if x.is_f64() {
+            nums.push(&x);
+        }
+    }
+
+    Ok(nums)
 }
 
 #[wasm_bindgen]
