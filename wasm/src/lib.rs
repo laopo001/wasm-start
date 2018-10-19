@@ -6,6 +6,7 @@ mod utils;
 
 use cfg_if::cfg_if;
 use wasm_bindgen::prelude::*;
+use js_sys::{ Array, Object };
 
 cfg_if! {
     // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -18,7 +19,7 @@ cfg_if! {
 }
 
 #[wasm_bindgen]
-extern {
+extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
 }
@@ -36,7 +37,7 @@ pub fn collect_numbers(some_iterable: &JsValue) -> Result<js_sys::Array, JsValue
 
         // If `x` is a number, add it to our array of numbers!
         // if x.is_f64() {
-            nums.push(&x);
+        nums.push(&x);
         // }
     }
 
@@ -64,6 +65,9 @@ pub fn run() -> Result<String, JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn createElement(nodeName: String, props: &JsValue, children : js_sys::Array) -> Result<String, JsValue> {
-    Ok("123".to_string())
+pub fn createElement(props: &JsValue) -> Result<Array, JsValue> {
+    let arr = Object::entries(js_sys::Object::try_from(props).unwrap());
+    Ok(arr)
 }
+
+
