@@ -102,25 +102,6 @@ export function run() {
 
 }
 
-/**
-* @param {any} arg0
-* @returns {any}
-*/
-export function createElement(arg0) {
-    try {
-        return takeObject(wasm.createElement(addBorrowedObject(arg0)));
-
-    } finally {
-        stack.pop();
-
-    }
-
-}
-
-const __widl_f_create_element_Document_target = Document.prototype.createElement || function() {
-    throw new Error(`wasm-bindgen: Document.prototype.createElement does not exist`);
-};
-
 function addHeapObject(obj) {
     if (slab_next === slab.length) slab.push(slab.length + 1);
     const idx = slab_next;
@@ -131,6 +112,27 @@ function addHeapObject(obj) {
     slab[idx] = { obj, cnt: 1 };
     return idx << 1;
 }
+/**
+* @param {any} arg0
+* @param {any} arg1
+* @param {any} arg2
+* @returns {any}
+*/
+export function createElement(arg0, arg1, arg2) {
+    try {
+        return takeObject(wasm.createElement(addBorrowedObject(arg0), addBorrowedObject(arg1), addHeapObject(arg2)));
+
+    } finally {
+        stack.pop();
+        stack.pop();
+
+    }
+
+}
+
+const __widl_f_create_element_Document_target = Document.prototype.createElement || function() {
+    throw new Error(`wasm-bindgen: Document.prototype.createElement does not exist`);
+};
 
 export function __widl_f_create_element_Document(arg0, arg1, arg2, exnptr) {
     let varg1 = getStringFromWasm(arg1, arg2);

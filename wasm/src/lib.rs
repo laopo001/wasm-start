@@ -5,8 +5,9 @@ extern crate web_sys;
 mod utils;
 
 use cfg_if::cfg_if;
+use js_sys::{Array, Object};
+use std::collections::HashMap;
 use wasm_bindgen::prelude::*;
-use js_sys::{ Array, Object };
 
 cfg_if! {
     // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -63,11 +64,21 @@ pub fn run() -> Result<String, JsValue> {
 
     Ok("123".to_string())
 }
+enum js_type {}
+
+struct VNode {
+    name: String,
+    key: String,
+    props: HashMap<String, js_type>,
+    children: Box<VNode>,
+}
 
 #[wasm_bindgen]
-pub fn createElement(props: &JsValue) -> Result<Array, JsValue> {
+pub fn createElement(
+    nodeName: &JsValue,
+    props: &JsValue,
+    children: Array,
+) -> Result<Array, JsValue> {
     let arr = Object::entries(js_sys::Object::try_from(props).unwrap());
     Ok(arr)
 }
-
-
