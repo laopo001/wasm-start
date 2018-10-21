@@ -79,6 +79,6 @@ pub fn createElement(
     props: &JsValue,
     children: Array,
 ) -> Result<Array, JsValue> {
-    let arr = Object::entries(js_sys::Object::try_from(props).unwrap());
+    let arr = Object::entries(Object::try_from(props).unwrap());
     Ok(arr)
 }
