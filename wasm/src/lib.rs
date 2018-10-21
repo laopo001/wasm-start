@@ -2,6 +2,9 @@ extern crate cfg_if;
 extern crate js_sys;
 extern crate wasm_bindgen;
 extern crate web_sys;
+
+mod h;
+mod vnode;
 mod utils;
 
 use cfg_if::cfg_if;
@@ -63,22 +66,4 @@ pub fn run() -> Result<String, JsValue> {
     std::convert::AsRef::<web_sys::Node>::as_ref(&body).append_child(val.as_ref())?;
 
     Ok("123".to_string())
-}
-enum js_type {}
-
-struct VNode {
-    name: String,
-    key: String,
-    props: HashMap<String, js_type>,
-    children: Box<Vec<VNode>>,
-}
-
-#[wasm_bindgen]
-pub fn createElement(
-    nodeName: &JsValue,
-    props: &JsValue,
-    children: Array,
-) -> Result<Array, JsValue> {
-    let arr = Object::entries(Object::try_from(props).unwrap());
-    Ok(arr)
 }

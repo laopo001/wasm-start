@@ -5,7 +5,7 @@
  * @author: liaodh
  * @summary: short description for the file
  * -----
- * Last Modified: Saturday, October 20th 2018, 3:02:38 pm
+ * Last Modified: Monday, October 22nd 2018, 12:09:17 am
  * Modified By: liaodh
  * -----
  * Copyright (c) 2018 jiguang
@@ -16,5 +16,3 @@ import * as wasm from 'wasm';
 console.log(wasm.run())
 
 console.log(wasm.collect_numbers([1, 2]))
-
-console.log(wasm.createElement('123', { name: 123 }, []))

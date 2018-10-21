@@ -102,6 +102,10 @@ export function run() {
 
 }
 
+const __widl_f_create_element_Document_target = Document.prototype.createElement || function() {
+    throw new Error(`wasm-bindgen: Document.prototype.createElement does not exist`);
+};
+
 function addHeapObject(obj) {
     if (slab_next === slab.length) slab.push(slab.length + 1);
     const idx = slab_next;
@@ -112,27 +116,6 @@ function addHeapObject(obj) {
     slab[idx] = { obj, cnt: 1 };
     return idx << 1;
 }
-/**
-* @param {any} arg0
-* @param {any} arg1
-* @param {any} arg2
-* @returns {any}
-*/
-export function createElement(arg0, arg1, arg2) {
-    try {
-        return takeObject(wasm.createElement(addBorrowedObject(arg0), addBorrowedObject(arg1), addHeapObject(arg2)));
-
-    } finally {
-        stack.pop();
-        stack.pop();
-
-    }
-
-}
-
-const __widl_f_create_element_Document_target = Document.prototype.createElement || function() {
-    throw new Error(`wasm-bindgen: Document.prototype.createElement does not exist`);
-};
 
 export function __widl_f_create_element_Document(arg0, arg1, arg2, exnptr) {
     let varg1 = getStringFromWasm(arg1, arg2);
@@ -270,14 +253,6 @@ const __wbg_value_0d5b146abcfc1b1e_target = function() {
 
 export function __wbg_value_0d5b146abcfc1b1e(arg0) {
     return addHeapObject(__wbg_value_0d5b146abcfc1b1e_target.call(getObject(arg0)));
-}
-
-const __wbg_entries_836348822f11e2f9_target = Object.entries.bind(Object) || function() {
-    throw new Error(`wasm-bindgen: Object.entries.bind(Object) does not exist`);
-};
-
-export function __wbg_entries_836348822f11e2f9(arg0) {
-    return addHeapObject(__wbg_entries_836348822f11e2f9_target(getObject(arg0)));
 }
 
 const __wbg_get_b5fa2669cbf91d6f_target = Reflect.get.bind(Reflect) || function() {
