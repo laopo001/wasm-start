@@ -70,7 +70,7 @@ struct VNode {
     name: String,
     key: String,
     props: HashMap<String, js_type>,
-    children: Box<VNode>,
+    children: Box<Vec<VNode>>,
 }
 
 #[wasm_bindgen]
